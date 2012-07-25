@@ -90,12 +90,6 @@ var drawingApp = (function () {
 		},
 		curColor = colorGreen,
 
-		// Clears the canvas.
-		clearCanvas = function () {
-
-			context.clearRect(0, 0, canvasWidth, canvasHeight);
-		},
-
 		// Draw a color swatch
 		drawColorSwatch = function (color, x, y) {
 
@@ -110,6 +104,26 @@ var drawingApp = (function () {
 			} else {
 				context.drawImage(swatchImage, x, y, swatchImageWidth, swatchImageHeight);
 			}
+		},
+
+		addClick = function (x, y, dragging) {
+
+			clickX.push(x);
+			clickY.push(y);
+			clickTool.push(curTool);
+			clickColor.push(curColor);
+			clickSize.push(curSize);
+			clickDrag.push(dragging);
+		},
+
+		clearClick = function () {
+
+			clickX = [clickX[clickX.length - 1]];
+			clickY = [clickY[clickY.length - 1]];
+			clickTool = [clickTool[clickTool.length - 1]];
+			clickColor = [clickColor[clickColor.length - 1]];
+			clickSize = [clickSize[clickSize.length - 1]];
+			clickDrag = [clickDrag[clickDrag.length - 1]];
 		},
 
 		// Redraws the canvas.
@@ -167,7 +181,7 @@ var drawingApp = (function () {
 				return;
 			}
 
-			clearCanvas();
+			//clearCanvas();
 
 			if (curTool === "crayon") {
 
@@ -282,60 +296,56 @@ var drawingApp = (function () {
 				context.fillStyle = '#333333';
 				context.fill();
 
-				// Keep the drawing in the drawing area
-				//context.save();
-				//context.beginPath();
-				//context.rect(drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
-				//context.clip();
+				if (clickX.length) {
 
-				// For each point drawn
-				for (i = 0; i < clickX.length; i += 1) {
+					// For each point drawn
+					for (i = 0; i < clickX.length; i += 1) {
 
-					// Set the drawing radius
-					switch (clickSize[i]) {
-					case "small":
-						radius = 2;
-						break;
-					case "normal":
-						radius = 5;
-						break;
-					case "large":
-						radius = 10;
-						break;
-					case "huge":
-						radius = 20;
-						break;
-					default:
-						break;
+						contexts.drawing.beginPath();
+
+						// Set the drawing radius
+						switch (clickSize[i]) {
+						case "small":
+							radius = 2;
+							break;
+						case "normal":
+							radius = 5;
+							break;
+						case "large":
+							radius = 10;
+							break;
+						case "huge":
+							radius = 20;
+							break;
+						default:
+							break;
+						}
+
+						// If dragging then draw a line between the two points
+						if (clickDrag[i] && i) {
+							contexts.drawing.moveTo(clickX[i - 1], clickY[i - 1]);
+						} else {
+							// The x position is moved over one pixel so a circle even if not dragging
+							contexts.drawing.moveTo(clickX[i] - 1, clickY[i]);
+						}
+						contexts.drawing.lineTo(clickX[i], clickY[i]);
+
+						// Set the drawing color
+						if (curTool === "eraser") {
+							contexts.drawing.strokeStyle = 'white';
+						} else {
+							contexts.drawing.strokeStyle = "rgb(" + clickColor[i].r + ", " + clickColor[i].g + ", " + clickColor[i].b + ")";
+						}
+
+						contexts.drawing.lineCap = "round";
+						contexts.drawing.lineJoin = "round";
+						contexts.drawing.lineWidth = radius;
+						contexts.drawing.stroke();
+						contexts.drawing.closePath();
 					}
 
-					// Set the drawing path
-					contexts.drawing.beginPath();
-					// If dragging then draw a line between the two points
-					if (clickDrag[i] && i) {
-						contexts.drawing.moveTo(clickX[i - 1], clickY[i - 1]);
-					} else {
-						// The x position is moved over one pixel so a circle even if not dragging
-						contexts.drawing.moveTo(clickX[i] - 1, clickY[i]);
-					}
-					contexts.drawing.lineTo(clickX[i], clickY[i]);
-
-					// Set the drawing color
-					if (clickTool[i] === "eraser") {
-						//context.globalCompositeOperation = "destination-out"; // To erase instead of draw over with white
-						contexts.drawing.strokeStyle = 'white';
-					} else {
-						//context.globalCompositeOperation = "source-over";	// To erase instead of draw over with white
-						contexts.drawing.strokeStyle = "rgb(" + clickColor[i].r + ", " + clickColor[i].g + ", " + clickColor[i].b + ")";
-					}
-					contexts.drawing.lineCap = "round";
-					contexts.drawing.lineJoin = "round";
-					contexts.drawing.lineWidth = radius;
-					contexts.drawing.stroke();
+					clearClick();
 				}
-				contexts.drawing.closePath();
-				//context.globalCompositeOperation = "source-over";// To erase instead of draw over with white
-				//context.restore();
 			}
 
 			// Overlay a crayon texture (if the current tool is crayon)
@@ -344,20 +354,6 @@ var drawingApp = (function () {
 			} else {
 				contexts.texture.canvas.style.display = "none";
 			}
-		},
-
-		// Adds a point to the drawing array.
-		// @param x
-		// @param y
-		// @param dragging
-		addClick = function (x, y, dragging) {
-
-			clickX.push(x);
-			clickY.push(y);
-			clickTool.push(curTool);
-			clickColor.push(curColor);
-			clickSize.push(curSize);
-			clickDrag.push(dragging);
 		},
 
 		matchOutlineColor = function (r, g, b, a) {
@@ -670,7 +666,7 @@ var drawingApp = (function () {
 			canvasElement.setAttribute('height', canvasHeight);
 			canvasElement.setAttribute('id', 'gui');
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager !== "undefined") {
+			if (typeof G_vmlCanvasManager) {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			context = canvasElement.getContext("2d"); // Grab the 2d canvas context
@@ -684,7 +680,7 @@ var drawingApp = (function () {
 			canvasElement.style.marginLeft = drawingAreaX + "px";
 			canvasElement.style.marginTop = drawingAreaY + "px";
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager !== "undefined") {
+			if (typeof G_vmlCanvasManager) {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			contexts.drawing = canvasElement.getContext("2d"); // Grab the 2d canvas context
@@ -696,7 +692,7 @@ var drawingApp = (function () {
 			canvasElement.style.marginLeft = drawingAreaX + "px";
 			canvasElement.style.marginTop = drawingAreaY + "px";
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager !== "undefined") {
+			if (typeof G_vmlCanvasManager) {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			contexts.texture = canvasElement.getContext("2d"); // Grab the 2d canvas context
@@ -708,7 +704,7 @@ var drawingApp = (function () {
 			canvasElement.style.marginLeft = drawingAreaX + "px";
 			canvasElement.style.marginTop = drawingAreaY + "px";
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager !== "undefined") {
+			if (typeof G_vmlCanvasManager) {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			contexts.outline = canvasElement.getContext("2d"); // Grab the 2d canvas context
