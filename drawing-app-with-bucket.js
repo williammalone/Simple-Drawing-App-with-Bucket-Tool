@@ -666,7 +666,7 @@ var drawingApp = (function () {
 			canvasElement.setAttribute('height', canvasHeight);
 			canvasElement.setAttribute('id', 'gui');
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager) {
+			if (typeof G_vmlCanvasManager !== "undefined") {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			context = canvasElement.getContext("2d"); // Grab the 2d canvas context
@@ -680,7 +680,7 @@ var drawingApp = (function () {
 			canvasElement.style.marginLeft = drawingAreaX + "px";
 			canvasElement.style.marginTop = drawingAreaY + "px";
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager) {
+			if (typeof G_vmlCanvasManager !== "undefined") {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			contexts.drawing = canvasElement.getContext("2d"); // Grab the 2d canvas context
@@ -692,7 +692,7 @@ var drawingApp = (function () {
 			canvasElement.style.marginLeft = drawingAreaX + "px";
 			canvasElement.style.marginTop = drawingAreaY + "px";
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager) {
+			if (typeof G_vmlCanvasManager !== "undefined") {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			contexts.texture = canvasElement.getContext("2d"); // Grab the 2d canvas context
@@ -704,7 +704,7 @@ var drawingApp = (function () {
 			canvasElement.style.marginLeft = drawingAreaX + "px";
 			canvasElement.style.marginTop = drawingAreaY + "px";
 			document.getElementById('canvasDiv').appendChild(canvasElement);
-			if (typeof G_vmlCanvasManager) {
+			if (typeof G_vmlCanvasManager !== "undefined") {
 				canvasElement = G_vmlCanvasManager.initElement(canvasElement);
 			}
 			contexts.outline = canvasElement.getContext("2d"); // Grab the 2d canvas context
