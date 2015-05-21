@@ -107,6 +107,7 @@ var drawingApp = (function () {
 		},
 
 		addClick = function (x, y, dragging) {
+window.console.log("addClick: " + x + ", " + y);
 
 			clickX.push(x);
 			clickY.push(y);
@@ -550,6 +551,7 @@ var drawingApp = (function () {
 			},
 
 				drag = function (e) {
+
 					if (curTool !== "bucket") {
 						if (paint) {
 							addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
@@ -561,6 +563,7 @@ var drawingApp = (function () {
 				},
 
 				release = function () {
+
 					if (curTool !== "bucket") {
 						paint = false;
 					}
@@ -576,8 +579,8 @@ var drawingApp = (function () {
 				pressDrawing = function (e) {
 
 					// Mouse down location
-					var mouseX = e.pageX - this.offsetLeft,
-						mouseY = e.pageY - this.offsetTop;
+					var mouseX = e.changedTouches[0].pageX - this.offsetLeft,
+						mouseY = e.changedTouches[0].pageY - this.offsetTop;
 
 					if (curTool === "bucket") {
 						// Mouse click location on drawing area
@@ -591,9 +594,10 @@ var drawingApp = (function () {
 				},
 
 				dragDrawing = function (e) {
+
 					if (curTool !== "bucket") {
 						if (paint) {
-							addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+							addClick(e.changedTouches[0].pageX - this.offsetLeft, e.changedTouches[0].pageY - this.offsetTop, true);
 							redraw();
 						}
 					}
@@ -603,6 +607,7 @@ var drawingApp = (function () {
 				},
 
 				releaseDrawing = function () {
+
 					if (curTool !== "bucket") {
 						paint = false;
 						redraw();
@@ -616,7 +621,7 @@ var drawingApp = (function () {
 				};
 
 			// Add mouse event listeners to canvas element
-			context.canvas.addEventListener("mousedown", press, false);
+			/*context.canvas.addEventListener("mousedown", press, false);
 			context.canvas.addEventListener("mousemove", drag, false);
 			context.canvas.addEventListener("mouseup", release);
 			context.canvas.addEventListener("mouseout", cancel, false);
@@ -631,7 +636,7 @@ var drawingApp = (function () {
 			contexts.outline.canvas.addEventListener("mousedown", pressDrawing, false);
 			contexts.outline.canvas.addEventListener("mousemove", dragDrawing, false);
 			contexts.outline.canvas.addEventListener("mouseup", releaseDrawing);
-			contexts.outline.canvas.addEventListener("mouseout", cancelDrawing, false);
+			contexts.outline.canvas.addEventListener("mouseout", cancelDrawing, false);*/
 
 			// Add touch event listeners to canvas element
 			contexts.outline.canvas.addEventListener("touchstart", pressDrawing, false);
